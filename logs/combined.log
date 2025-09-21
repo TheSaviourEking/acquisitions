@@ -1,0 +1,3 @@
+{"level":"info","message":"Hello from acquisition!","service":"acquisitions-api"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [21/Sep/2025:02:19:14 +0000] \"GET / HTTP/1.1\" 200 24 \"-\" \"Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0\"","service":"acquisitions-api"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [21/Sep/2025:02:19:14 +0000] \"GET /favicon.ico HTTP/1.1\" 404 150 \"-\" \"Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0\"","service":"acquisitions-api"}
