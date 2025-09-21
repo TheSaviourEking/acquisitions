@@ -5,6 +5,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 ## Development Commands
 
 ### Core Development
+
 ```bash
 # Start development server with file watching
 npm run dev
@@ -26,6 +27,7 @@ npm run format:check
 ```
 
 ### Database Operations
+
 ```bash
 # Generate new migration files from schema changes
 npm run db:generate
@@ -40,6 +42,7 @@ npm run db:studio
 ## Project Architecture
 
 ### Tech Stack
+
 - **Runtime**: Node.js with ES modules (`"type": "module"`)
 - **Framework**: Express.js 5.x
 - **Database**: PostgreSQL with Neon serverless driver
@@ -50,6 +53,7 @@ npm run db:studio
 - **Security**: Helmet, CORS, cookie-parser
 
 ### Directory Structure
+
 ```
 src/
 ├── config/          # Configuration files (database, logger)
@@ -62,7 +66,9 @@ src/
 ```
 
 ### Path Aliases
+
 The project uses Node.js subpath imports for clean imports:
+
 - `#config/*` → `./src/config/*`
 - `#controllers/*` → `./src/controllers/*`
 - `#models/*` → `./src/models/*`
@@ -72,6 +78,7 @@ The project uses Node.js subpath imports for clean imports:
 - `#validations/*` → `./src/validations/*`
 
 ### Database Architecture
+
 - **ORM**: Drizzle ORM with PostgreSQL dialect
 - **Driver**: Neon serverless for edge-compatible PostgreSQL connections
 - **Migrations**: Located in `drizzle/` directory, managed via drizzle-kit
@@ -79,25 +86,28 @@ The project uses Node.js subpath imports for clean imports:
 - **Current Tables**: Users table with authentication fields (id, name, email, password, role, timestamps)
 
 ### Authentication Flow
-1. **User Registration**: POST `/api/auth/sign-up`
-   - Validates input with Zod schema
-   - Hashes password with bcrypt (10 rounds)
-   - Creates user in database
-   - Returns JWT token and sets HTTP-only cookie
 
-2. **JWT Implementation**: 
-   - Uses `jsonwebtoken` library
-   - 1-day expiration by default
-   - Payload includes: user ID, email, role
-   - Secret key from environment (`JWT_SECRET`)
+1. **User Registration**: POST `/api/auth/sign-up`
+    - Validates input with Zod schema
+    - Hashes password with bcrypt (10 rounds)
+    - Creates user in database
+    - Returns JWT token and sets HTTP-only cookie
+
+2. **JWT Implementation**:
+    - Uses `jsonwebtoken` library
+    - 1-day expiration by default
+    - Payload includes: user ID, email, role
+    - Secret key from environment (`JWT_SECRET`)
 
 ### Validation Strategy
+
 - All input validation uses Zod schemas
 - Validation schemas located in `src/validations/`
 - Custom error formatting utility in `src/utils/format.js`
 - Failed validation returns structured error responses
 
 ### Logging Configuration
+
 - Winston logger with multiple transports
 - File logging: `logs/error.log` (errors only) and `logs/combined.log` (all levels)
 - Console logging in non-production environments
@@ -105,6 +115,7 @@ The project uses Node.js subpath imports for clean imports:
 - Service identifier: `acquisitions-api`
 
 ### Code Style
+
 - **ESLint**: Modern flat config with recommended rules
 - **Prettier**: 4-space indentation, single quotes, Unix line endings
 - **Rules**: No unused variables (except prefixed with `_`), prefer const, no var, arrow functions preferred
@@ -113,6 +124,7 @@ The project uses Node.js subpath imports for clean imports:
 ## Environment Setup
 
 ### Required Environment Variables
+
 ```bash
 # Server
 PORT=5000
@@ -127,6 +139,7 @@ JWT_SECRET='your-secret-key-please-change-in-production'
 ```
 
 ### Database Setup
+
 1. Set up PostgreSQL database (Neon recommended)
 2. Configure `DATABASE_URL` in `.env`
 3. Run `npm run db:generate` to create initial migrations
@@ -135,11 +148,13 @@ JWT_SECRET='your-secret-key-please-change-in-production'
 ## API Endpoints
 
 ### Health Checks
+
 - `GET /` - Basic health check
 - `GET /health` - Detailed health check with uptime and timestamp
 - `GET /api` - API status check
 
 ### Authentication
+
 - `POST /api/auth/sign-up` - User registration
 - `POST /api/auth/sign-in` - User login (placeholder)
 - `POST /api/auth/sign-out` - User logout (placeholder)
@@ -147,23 +162,27 @@ JWT_SECRET='your-secret-key-please-change-in-production'
 ## Development Patterns
 
 ### Service Layer Pattern
+
 - Controllers handle HTTP concerns (request/response)
 - Services contain business logic and database operations
 - Clear separation of concerns between layers
 
 ### Error Handling
+
 - Service layer throws descriptive errors
 - Controllers catch and format errors appropriately
 - Validation errors return 400 with details
 - Business logic errors (e.g., duplicate email) return appropriate status codes
 
 ### Security Practices
+
 - Passwords hashed with bcrypt before storage
 - JWT tokens for stateless authentication
 - HTTP-only cookies for token storage
 - CORS and Helmet middleware for security headers
 
 ### Database Patterns
+
 - Schema-first approach with Drizzle ORM
 - Type-safe database operations
 - Migration-based schema changes
