@@ -39,6 +39,28 @@ npm run db:migrate
 npm run db:studio
 ```
 
+### Docker Development
+
+```bash
+# Start development environment with Neon Local (automated)
+./scripts/dev.sh
+
+# Start production environment with Neon Cloud (automated)
+./scripts/prod.sh
+
+# Manual Docker commands
+npm run dev:docker    # Equivalent to ./scripts/dev.sh
+npm run prod:docker   # Equivalent to ./scripts/prod.sh
+
+# Docker Compose operations
+docker-compose --env-file .env.dev.local -f docker-compose.dev.yml up --build
+docker-compose -f docker-compose.prod.yml up --build -d
+
+# Execute commands in running containers
+docker-compose -f docker-compose.dev.yml exec app npm run db:migrate
+docker-compose -f docker-compose.prod.yml exec app npm run lint
+```
+
 ## Project Architecture
 
 ### Tech Stack
@@ -50,14 +72,15 @@ npm run db:studio
 - **Authentication**: JWT tokens with bcrypt password hashing
 - **Validation**: Zod schemas
 - **Logging**: Winston with file and console transports
-- **Security**: Helmet, CORS, cookie-parser
+- **Security**: Helmet, CORS, cookie-parser, Arcjet (bot detection, rate limiting, shield)
 
 ### Directory Structure
 
 ```
 src/
-├── config/          # Configuration files (database, logger)
+├── config/          # Configuration files (database, logger, arcjet)
 ├── controllers/     # Request handlers and business logic
+├── middleware/      # Custom middleware (security)
 ├── models/          # Drizzle ORM database schemas
 ├── routes/          # Express route definitions
 ├── services/        # Business logic layer
@@ -71,6 +94,7 @@ The project uses Node.js subpath imports for clean imports:
 
 - `#config/*` → `./src/config/*`
 - `#controllers/*` → `./src/controllers/*`
+- `#middleware/*` → `./src/middleware/*`
 - `#models/*` → `./src/models/*`
 - `#routes/*` → `./src/routes/*`
 - `#services/*` → `./src/services/*`
