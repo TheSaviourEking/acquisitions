@@ -5,14 +5,16 @@ import { eq } from 'drizzle-orm';
 
 const getAllUsers = async () => {
     try {
-        const fetchedUsers = await db.select({
-            id: users.id,
-            email: users.email,
-            name: users.name,
-            role: users.role,
-            created_at: users.created_at,
-            updated_at: users.updated_at
-        }).from(users);
+        const fetchedUsers = await db
+            .select({
+                id: users.id,
+                email: users.email,
+                name: users.name,
+                role: users.role,
+                created_at: users.created_at,
+                updated_at: users.updated_at,
+            })
+            .from(users);
 
         return fetchedUsers;
     } catch (error) {
@@ -21,16 +23,20 @@ const getAllUsers = async () => {
     }
 };
 
-const getUserById = async (id) => {
+const getUserById = async id => {
     try {
-        const [user] = await db.select({
-            id: users.id,
-            email: users.email,
-            name: users.name,
-            role: users.role,
-            created_at: users.created_at,
-            updated_at: users.updated_at
-        }).from(users).where(eq(users.id, id)).limit(1);
+        const [user] = await db
+            .select({
+                id: users.id,
+                email: users.email,
+                name: users.name,
+                role: users.role,
+                created_at: users.created_at,
+                updated_at: users.updated_at,
+            })
+            .from(users)
+            .where(eq(users.id, id))
+            .limit(1);
 
         if (!user) {
             throw new Error('User not found');
@@ -46,9 +52,13 @@ const getUserById = async (id) => {
 const updateUser = async (id, updates) => {
     try {
         // Check if user exists
-        const [existingUser] = await db.select({
-            id: users.id
-        }).from(users).where(eq(users.id, id)).limit(1);
+        const [existingUser] = await db
+            .select({
+                id: users.id,
+            })
+            .from(users)
+            .where(eq(users.id, id))
+            .limit(1);
 
         if (!existingUser) {
             throw new Error('User not found');
@@ -57,7 +67,7 @@ const updateUser = async (id, updates) => {
         // Add updated_at timestamp to updates
         const updatesWithTimestamp = {
             ...updates,
-            updated_at: new Date()
+            updated_at: new Date(),
         };
 
         // Perform the update
@@ -71,7 +81,7 @@ const updateUser = async (id, updates) => {
                 name: users.name,
                 role: users.role,
                 created_at: users.created_at,
-                updated_at: users.updated_at
+                updated_at: users.updated_at,
             });
 
         logger.info(`User ${id} updated successfully`);
@@ -82,13 +92,17 @@ const updateUser = async (id, updates) => {
     }
 };
 
-const deleteUser = async (id) => {
+const deleteUser = async id => {
     try {
         // Check if user exists
-        const [existingUser] = await db.select({
-            id: users.id,
-            email: users.email
-        }).from(users).where(eq(users.id, id)).limit(1);
+        const [existingUser] = await db
+            .select({
+                id: users.id,
+                email: users.email,
+            })
+            .from(users)
+            .where(eq(users.id, id))
+            .limit(1);
 
         if (!existingUser) {
             throw new Error('User not found');
@@ -101,7 +115,7 @@ const deleteUser = async (id) => {
             .returning({
                 id: users.id,
                 email: users.email,
-                name: users.name
+                name: users.name,
             });
 
         logger.info(`User ${existingUser.email} deleted successfully`);
@@ -116,7 +130,7 @@ const usersService = {
     getAllUsers,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
 };
 
 export default usersService;

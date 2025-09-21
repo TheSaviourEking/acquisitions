@@ -1,7 +1,10 @@
 import logger from '#config/logger.js';
 import usersService from '#services/users.service.js';
 import { formatValidationError } from '#utils/format.js';
-import { userIdSchema, updateUserSchema } from '#validations/users.validation.js';
+import {
+    userIdSchema,
+    updateUserSchema,
+} from '#validations/users.validation.js';
 
 export const fetchAllUsers = async (req, res, next) => {
     try {
@@ -12,7 +15,7 @@ export const fetchAllUsers = async (req, res, next) => {
         res.json({
             message: 'Successfully retrieved users',
             users: allUsers,
-            count: allUsers.length
+            count: allUsers.length,
         });
     } catch (error) {
         logger.error(error);
@@ -28,7 +31,7 @@ export const getUserById = async (req, res, next) => {
         if (!validationResult.success) {
             return res.status(400).json({
                 error: 'Validation failed',
-                details: formatValidationError(validationResult.error)
+                details: formatValidationError(validationResult.error),
             });
         }
 
@@ -37,10 +40,12 @@ export const getUserById = async (req, res, next) => {
 
         // Authorization check: users can only get their own info, admins can get any user info
         if (currentUser.id !== id && currentUser.role !== 'admin') {
-            logger.warn(`User ${currentUser.email} attempted to access user ${id}`);
+            logger.warn(
+                `User ${currentUser.email} attempted to access user ${id}`
+            );
             return res.status(403).json({
                 error: 'Forbidden',
-                message: 'You can only access your own information'
+                message: 'You can only access your own information',
             });
         }
 
@@ -49,15 +54,15 @@ export const getUserById = async (req, res, next) => {
 
         res.json({
             message: 'User retrieved successfully',
-            user
+            user,
         });
     } catch (error) {
         logger.error(`Error getting user: ${error.message}`);
-        
+
         if (error.message === 'User not found') {
             return res.status(404).json({ error: 'User not found' });
         }
-        
+
         next(error);
     }
 };
@@ -69,7 +74,7 @@ export const updateUser = async (req, res, next) => {
         if (!paramValidation.success) {
             return res.status(400).json({
                 error: 'Validation failed',
-                details: formatValidationError(paramValidation.error)
+                details: formatValidationError(paramValidation.error),
             });
         }
 
@@ -78,7 +83,7 @@ export const updateUser = async (req, res, next) => {
         if (!bodyValidation.success) {
             return res.status(400).json({
                 error: 'Validation failed',
-                details: formatValidationError(bodyValidation.error)
+                details: formatValidationError(bodyValidation.error),
             });
         }
 
@@ -89,19 +94,23 @@ export const updateUser = async (req, res, next) => {
         // Authorization checks
         // Users can only update their own information
         if (currentUser.id !== id && currentUser.role !== 'admin') {
-            logger.warn(`User ${currentUser.email} attempted to update user ${id}`);
+            logger.warn(
+                `User ${currentUser.email} attempted to update user ${id}`
+            );
             return res.status(403).json({
                 error: 'Forbidden',
-                message: 'You can only update your own information'
+                message: 'You can only update your own information',
             });
         }
 
         // Only admins can change user roles
         if (updates.role && currentUser.role !== 'admin') {
-            logger.warn(`Non-admin user ${currentUser.email} attempted to change role`);
+            logger.warn(
+                `Non-admin user ${currentUser.email} attempted to change role`
+            );
             return res.status(403).json({
                 error: 'Forbidden',
-                message: 'Only administrators can change user roles'
+                message: 'Only administrators can change user roles',
             });
         }
 
@@ -110,15 +119,15 @@ export const updateUser = async (req, res, next) => {
 
         res.json({
             message: 'User updated successfully',
-            user: updatedUser
+            user: updatedUser,
         });
     } catch (error) {
         logger.error(`Error updating user: ${error.message}`);
-        
+
         if (error.message === 'User not found') {
             return res.status(404).json({ error: 'User not found' });
         }
-        
+
         next(error);
     }
 };
@@ -131,7 +140,7 @@ export const deleteUser = async (req, res, next) => {
         if (!validationResult.success) {
             return res.status(400).json({
                 error: 'Validation failed',
-                details: formatValidationError(validationResult.error)
+                details: formatValidationError(validationResult.error),
             });
         }
 
@@ -141,19 +150,24 @@ export const deleteUser = async (req, res, next) => {
         // Authorization checks
         // Users can delete their own account, or admins can delete any account
         if (currentUser.id !== id && currentUser.role !== 'admin') {
-            logger.warn(`User ${currentUser.email} attempted to delete user ${id}`);
+            logger.warn(
+                `User ${currentUser.email} attempted to delete user ${id}`
+            );
             return res.status(403).json({
                 error: 'Forbidden',
-                message: 'You can only delete your own account or admin can delete any account'
+                message:
+                    'You can only delete your own account or admin can delete any account',
             });
         }
 
         // Prevent admins from deleting themselves (business rule)
         if (currentUser.id === id && currentUser.role === 'admin') {
-            logger.warn(`Admin ${currentUser.email} attempted to delete their own account`);
+            logger.warn(
+                `Admin ${currentUser.email} attempted to delete their own account`
+            );
             return res.status(403).json({
                 error: 'Forbidden',
-                message: 'Administrators cannot delete their own accounts'
+                message: 'Administrators cannot delete their own accounts',
             });
         }
 
@@ -162,15 +176,15 @@ export const deleteUser = async (req, res, next) => {
 
         res.json({
             message: 'User deleted successfully',
-            user: deletedUser
+            user: deletedUser,
         });
     } catch (error) {
         logger.error(`Error deleting user: ${error.message}`);
-        
+
         if (error.message === 'User not found') {
             return res.status(404).json({ error: 'User not found' });
         }
-        
+
         next(error);
     }
 };

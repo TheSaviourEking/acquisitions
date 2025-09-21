@@ -1,5 +1,13 @@
-import { fetchAllUsers, getUserById, updateUser, deleteUser } from '#controllers/users.controller.js';
-import { authenticateToken, requireAdmin } from '#middleware/auth.middleware.js';
+import {
+    fetchAllUsers,
+    getUserById,
+    updateUser,
+    deleteUser,
+} from '#controllers/users.controller.js';
+import {
+    authenticateToken,
+    requireAdmin,
+} from '#middleware/auth.middleware.js';
 import express from 'express';
 
 const router = express.Router();

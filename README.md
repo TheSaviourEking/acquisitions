@@ -59,6 +59,7 @@ docker-compose --env-file .env.prod.local -f docker-compose.prod.yml up --build 
 ## 📋 Available Scripts
 
 ### Development
+
 - `npm run dev` - Start development server with file watching
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix linting issues automatically
@@ -66,11 +67,13 @@ docker-compose --env-file .env.prod.local -f docker-compose.prod.yml up --build 
 - `npm run format:check` - Check code formatting
 
 ### Database
+
 - `npm run db:generate` - Generate migration files from schema changes
 - `npm run db:migrate` - Run pending migrations
 - `npm run db:studio` - Open Drizzle Studio (database browser)
 
 ### Production
+
 - `npm start` - Start production server
 
 ## 🐋 Docker Deployments
@@ -78,12 +81,14 @@ docker-compose --env-file .env.prod.local -f docker-compose.prod.yml up --build 
 This project supports two Docker deployment configurations:
 
 ### Development Environment
+
 - **Features**: Neon Local proxy, hot reloading, debug logging
 - **Database**: Ephemeral branches via Neon Local
 - **Command**: `./scripts/dev-start.sh`
 - **Compose File**: `docker-compose.dev.yml`
 
 ### Production Environment
+
 - **Features**: Optimized image, production logging, resource limits
 - **Database**: Direct connection to Neon Cloud
 - **Command**: `./scripts/prod-deploy.sh`
@@ -97,11 +102,13 @@ This project supports two Docker deployment configurations:
 ## 🔗 API Endpoints
 
 ### Health Checks
+
 - `GET /` - Basic health check
 - `GET /health` - Detailed health check with uptime and timestamp
 - `GET /api` - API status check
 
 ### Authentication
+
 - `POST /api/auth/sign-up` - User registration
 - `POST /api/auth/sign-in` - User login (placeholder)
 - `POST /api/auth/sign-out` - User logout (placeholder)
@@ -109,12 +116,14 @@ This project supports two Docker deployment configurations:
 ## 🔧 Environment Variables
 
 ### Required Variables
+
 - `PORT` - Server port (default: 5000)
 - `NODE_ENV` - Environment mode (development/production)
 - `DATABASE_URL` - PostgreSQL connection string
 - `JWT_SECRET` - Secret key for JWT tokens
 
 ### Optional Variables
+
 - `LOG_LEVEL` - Logging level (debug/info/warn/error)
 - `ARCJET_KEY` - Arcjet security service key
 
@@ -130,11 +139,13 @@ This project supports two Docker deployment configurations:
 ## 📊 Monitoring
 
 ### Health Checks
+
 - Built-in health endpoints
 - Docker health checks
 - Service dependency monitoring
 
 ### Logging
+
 - Winston logger with multiple transports
 - Structured logging in production
 - Log rotation and management
@@ -142,19 +153,19 @@ This project supports two Docker deployment configurations:
 ## 🚦 Getting Started
 
 1. **Choose your deployment method:**
-   - Local development: Follow "Local Development" section
-   - Docker development: Use `./scripts/dev-start.sh`
-   - Docker production: Use `./scripts/prod-deploy.sh`
+    - Local development: Follow "Local Development" section
+    - Docker development: Use `./scripts/dev-start.sh`
+    - Docker production: Use `./scripts/prod-deploy.sh`
 
 2. **Set up your database:**
-   - Create a Neon project at [neon.tech](https://neon.tech)
-   - Configure your environment variables
-   - Run database migrations
+    - Create a Neon project at [neon.tech](https://neon.tech)
+    - Configure your environment variables
+    - Run database migrations
 
 3. **Start developing:**
-   - The API will be available at http://localhost:5000
-   - Use the health endpoint to verify everything is working
-   - Check logs for any issues
+    - The API will be available at http://localhost:5000
+    - Use the health endpoint to verify everything is working
+    - Check logs for any issues
 
 ## 📝 License
 
