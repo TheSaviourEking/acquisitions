@@ -13,7 +13,8 @@ jobs:
         env:
             NODE_ENV: test
             NODE_OPTIONS: --experimental-vm-modules
-            DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+            # DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+            DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || 'postgresql://neondb_owner:npg_gs0rebGJd1Pn@ep-flat-heart-adlf65dj-pooler.c-2.us-east-1.aws.neon.tech/neondb' }}
 
         services:
             postgres:
@@ -57,7 +58,7 @@ jobs:
                   echo "Running database migrations for tests..."
                   npm run db:migrate
               env:
-                  DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+                  DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || 'postgresql://neondb_owner:npg_gs0rebGJd1Pn@ep-flat-heart-adlf65dj-pooler.c-2.us-east-1.aws.neon.tech/neondb' }}
 
             - name: Run tests
               id: tests
@@ -74,7 +75,7 @@ jobs:
               env:
                   NODE_ENV: test
                   NODE_OPTIONS: --experimental-vm-modules
-                  DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+                  DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || 'postgresql://neondb_owner:npg_gs0rebGJd1Pn@ep-flat-heart-adlf65dj-pooler.c-2.us-east-1.aws.neon.tech/neondb' }}
 
             - name: Upload coverage reports
               if: always()
