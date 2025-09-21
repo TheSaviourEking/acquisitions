@@ -65,13 +65,15 @@ const authenticateUser = async ({ email, password }) => {
         }
 
         const isPasswordValid = await comparePassword(password, existingUser.password);
-        
+
         if (!isPasswordValid) {
             throw new Error('Invalid credentials');
         }
 
         // Return user without password
+        // eslint-disable-next-line no-unused-vars
         const { password: _, ...userWithoutPassword } = existingUser;
+        console.log(userWithoutPassword, 'user without password');
         logger.info(`User authenticated successfully: ${email}`);
         return userWithoutPassword;
     } catch (error) {
