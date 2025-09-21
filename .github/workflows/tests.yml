@@ -1,0 +1,152 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      NODE_OPTIONS: --experimental-vm-modules
+      DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Wait for PostgreSQL
+        run: |
+          echo "Waiting for PostgreSQL to be ready..."
+          until pg_isready -h localhost -p 5432 -U test_user; do
+            echo "PostgreSQL is unavailable - sleeping"
+            sleep 1
+          done
+          echo "PostgreSQL is ready!"
+
+      - name: Run database migrations
+        run: |
+          echo "Running database migrations for tests..."
+          npm run db:migrate
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+
+      - name: Run tests
+        id: tests
+        run: |
+          echo "Running tests..."
+          if npm test -- --coverage --coverageReporters=text-lcov --coverageReporters=json --coverageDirectory=coverage; then
+            echo "test_result=success" >> $GITHUB_OUTPUT
+            echo "✅ All tests passed!"
+          else
+            echo "test_result=failure" >> $GITHUB_OUTPUT
+            echo "::error::Some tests failed. Please check the test output above."
+            exit 1
+          fi
+        env:
+          NODE_ENV: test
+          NODE_OPTIONS: --experimental-vm-modules
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage/
+            !coverage/node_modules
+          retention-days: 30
+
+      - name: Generate coverage summary
+        if: always()
+        run: |
+          if [ -f "coverage/coverage-summary.json" ]; then
+            echo "## 📊 Test Coverage Report" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Extract coverage percentages from coverage-summary.json
+            if command -v node >/dev/null 2>&1; then
+              node -e "
+                try {
+                  const fs = require('fs');
+                  const coverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+                  const total = coverage.total;
+                  console.log('| Metric | Coverage |');
+                  console.log('|--------|----------|');
+                  console.log('| Lines | ' + total.lines.pct + '% |');
+                  console.log('| Functions | ' + total.functions.pct + '% |');
+                  console.log('| Branches | ' + total.branches.pct + '% |');
+                  console.log('| Statements | ' + total.statements.pct + '% |');
+                } catch(e) {
+                  console.log('Coverage summary not available');
+                }
+              " >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "## 📊 Test Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Coverage report not generated." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Success summary
+        if: success()
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Tests Passed!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All tests completed successfully. Great work! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📁 Coverage reports have been uploaded as artifacts (retained for 30 days)." >> $GITHUB_STEP_SUMMARY
+
+      - name: Failure summary
+        if: failure()
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## ❌ Tests Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Some tests failed. Please check the detailed output above and fix the failing tests." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To run tests locally:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "```bash" >> $GITHUB_STEP_SUMMARY
+          echo "# Run all tests" >> $GITHUB_STEP_SUMMARY
+          echo "npm test" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "# Run tests with coverage" >> $GITHUB_STEP_SUMMARY
+          echo "npm test -- --coverage" >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
+
+      - name: Annotate test failures
+        if: failure()
+        run: |
+          echo "::error::Test suite failed. Check the test output above for specific failures."
+          echo "::notice::Coverage reports (if generated) are available in the artifacts section."
